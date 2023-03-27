@@ -67,7 +67,6 @@ a:hover {
 }
 
 .card {
-  min-width: 300px;
   height: fit-content;
   color: white;
   overflow: hidden;
@@ -105,8 +104,9 @@ a:hover {
 	flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
-  padding: 10px;
+  padding: 50px;
   background-color: rgb(97, 98, 100);
+  /* max-width: 350px; */
 }
 
 li {
