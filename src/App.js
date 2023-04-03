@@ -79,44 +79,55 @@ const mock = [
 function App() {
   const [conteudo, setConteudo] = useState(<></>);
 
-  function traduzirStatus(status) {
+  const [busca, setBusca] = useState("");
+
+  function getStatus(status) {
     switch (status) {
       case "Alive":
         return "Vivo";
       case "Dead":
         return "Morto";
-      default:
+      case "unknown":
         return "Desconhecido";
     }
   }
-  function traduzirGenero(gender) {
+  function getGender(gender) {
     switch (gender) {
       case "Male":
         return " Masculino";
       case "Female":
         return "Feminino";
-      default:
+      case "unknown":
         return "Desconhecido";
     }
   }
-  function traduzirEspecie(species) {
+  function getSpecies(species) {
     switch (species) {
       case "Human":
         return "Humano";
       case "Alien":
         return "Alien";
-      default:
+      case "unknown":
         return "Desconhecido";
     }
   }
   async function carragarTodosOsPersonagens() {
-    const retorno = await fetch("https://rickandmortyapi.com/api/character", {
+    var requestOptions = {
       method: "GET",
-    }).then((response) => response.json());
+      redirect: "follow",
+    };
+    const results = await fetch(
+      "https://rickandmortyapi.com/api/character" + busca,
+      requestOptions
+    )
+      .then((response) => response.text())
+      .then((result) => {
+        return result;
+      })
+      .catch((error) => console.log("error", error));
 
-    console.log(retorno);
-
-    return retorno.results;
+    const char = JSON.parse(results);
+    return char.results;
   }
 
   async function listaPersonagem() {
@@ -129,10 +140,10 @@ function App() {
           <h2>{personagem.name}</h2>
         </div>
         <div className="cardspecies">
-          <h3>Espécie: {traduzirEspecie(personagem.species)}</h3>
+          <h3>Espécie: {getSpecies(personagem.species)}</h3>
         </div>
         <div className="cardgender">
-          <h3>Gênero: {traduzirGenero(personagem.gender)}</h3>
+          <h3>Gênero: {getGender(personagem.gender)}</h3>
         </div>
         <div className="cardepisode">
           <div className="lista-secundaria">
@@ -145,26 +156,43 @@ function App() {
           </div>
         </div>
         <div className="cardstatus">
-          <h3>Estado: {traduzirStatus(personagem.status)}</h3>
+          <h3>Estado: {getStatus(personagem.status)}</h3>
         </div>
       </div>
     ));
   }
 
   useEffect(() => {
-    async function carregar() {
+    async function getConteudo() {
       setConteudo(await listaPersonagem());
     }
-    carregar();
-  }, []);
+    getConteudo();
+  }, [busca]);
 
   return (
     <div className="App">
       <header className="App-header">
         <h1>Rick and Morty API</h1>
       </header>
-      <div className="lista-principal">{conteudo}</div>
+    <div className="filtros">
+    <span className="titulo-filtros">Filtros</span>
+    <div className="filtro status">
+      <b>Status:</b>
+      <span onClick={() => setBusca('?status=alive')}>Vivo</span>
+      <span onClick={() => setBusca('?status=dead')}>Morto</span>
+      <span onClick={() => setBusca('?status=unknown')}>Desconhecido</span>
     </div>
+    <div className="filtro genero">
+      <b>Gênero:</b>
+      <span onClick={() => setBusca('?gender=male')}>Masculino</span>
+      <span onClick={() => setBusca('?gender=female')}>Feminino</span>
+      <span>Sem gênero</span>
+      <span onClick={() => setBusca('?gender=unknown')}>Desconhecido</span>
+    </div>
+  </div>
+  <div className="lista-principal">{conteudo}</div> 
+  </div>
+
   );
 }
 
